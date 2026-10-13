@@ -1,0 +1,36 @@
+[project]
+name = "graphql-sandbox"
+version = "0.1.0"
+description = "Учебный sandbox: FastAPI + Strawberry GraphQL + SQLAlchemy 2.0 (async) + PostgreSQL + DataLoader"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
+    "strawberry-graphql[fastapi]>=0.236",
+    "sqlalchemy[asyncio]>=2.0.30",
+    "asyncpg>=0.29",
+    "pydantic-settings>=2.2",
+    "ruff>=0.17.0",
+]
+
+[tool.uv]
+# Это приложение, а не библиотека: uv ставит только зависимости,
+# код запускается прямо из корня проекта (app/).
+package = false
+
+[dependency-groups]
+dev = [
+    "aiosqlite>=0.22.1",
+    "httpx>=0.28.1",
+    "pytest>=9.1.1",
+    "pytest-asyncio>=1.4.0",
+]
+
+[tool.pytest.ini_options]
+# Все тесты асинхронные — маркер asyncio не проставляем вручную.
+asyncio_mode = "auto"
+testpaths = ["tests"]
+# Проект не устанавливается как пакет (package = false у uv),
+# поэтому путь до app/ добавляем явно.
+pythonpath = ["."]

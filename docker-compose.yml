@@ -1,0 +1,35 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: graphql-sandbox-db
+    environment:
+      POSTGRES_USER: graphql
+      POSTGRES_PASSWORD: graphql
+      POSTGRES_DB: graphql
+    ports:
+      # На хосте Postgres виден на 5433, чтобы не конфликтовать
+      # с уже запущенным локальным Postgres (5432).
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U graphql -d graphql"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  api:
+    build: .
+    container_name: graphql-sandbox-api
+    environment:
+      # Внутри compose-сети хост БД — имя сервиса db.
+      DATABASE_URL: postgresql+asyncpg://graphql:graphql@db:5432/graphql
+      LOG_SQL: "true"
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:
